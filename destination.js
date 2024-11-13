@@ -17,6 +17,10 @@ app.use(cors(corsOptions)); // CORS 설정
 // JSON 파싱 미들웨어
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+    res.json(parkingCounts);
+});
+
 // 주차장 정보를 가져오는 엔드포인트 (URL 디코딩 처리)
 app.get('/:placeName', (req, res) => {
     const placeName = decodeURIComponent(req.params.placeName); // URL 디코딩
