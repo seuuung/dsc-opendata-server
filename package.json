@@ -4,8 +4,8 @@
   "description": "DSC OpenData Project Server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node destination.js",
+    "dev": "nodemon destination.js"
   },
   "keywords": [],
   "author": "Your Name",
