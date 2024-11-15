@@ -12,6 +12,7 @@ const corsOptions = {
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 };
+
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
@@ -27,17 +28,35 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocket.Server({ server });
 
-// 클라이언트 연결 이벤트
+// WebSocket 클라이언트 연결 이벤트
 wss.on('connection', (ws) => {
     console.log('웹소켓 클라이언트 연결됨');
+
+    // 클라이언트에게 ping 메시지를 주기적으로 전송
+    const pingInterval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.ping();
+        }
+    }, 30000); // 30초마다 ping 메시지 전송
+
+    // 클라이언트가 pong 응답을 보내면 로그 출력
+    ws.on('pong', () => {
+        console.log('pong 응답 받음');
+    });
+
+    // 클라이언트 연결 종료 시 pingInterval 클리어
+    ws.on('close', () => {
+        clearInterval(pingInterval);
+        console.log('웹소켓 클라이언트 연결 종료됨');
+    });
+
+    // 클라이언트로 초기 상태 전송
+    ws.send(JSON.stringify({ type: 'initial', data: parkingCounts }));
 
     // 주차장 카운트 업데이트 시 클라이언트로 전송
     ws.on('message', (message) => {
         console.log('메시지 수신:', message);
     });
-
-    // 연결된 클라이언트에 초기 상태 전송
-    ws.send(JSON.stringify({ type: 'initial', data: parkingCounts }));
 });
 
 // 목적지 설정/해제 요청 처리
